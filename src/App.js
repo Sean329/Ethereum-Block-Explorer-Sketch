@@ -11,26 +11,35 @@ const settings = {
   network: Network.ETH_MAINNET,
 };
 
-
-// In this week's lessons we used ethers.js. Here we are using the
-// Alchemy SDK is an umbrella library with several different packages.
-//
 // You can read more about the packages here:
 //   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
 const alchemy = new Alchemy(settings);
 
 function App() {
-  const [blockNumber, setBlockNumber] = useState();
+  const [blockNumber, setBlockNumber] = useState(0);
+  const [trxnInfo, settrxnInfo] = useState([]);
 
   useEffect(() => {
     async function getBlockNumber() {
-      setBlockNumber(await alchemy.core.getBlockNumber());
+      const _blockNumber = await alchemy.core.getBlockNumber();
+      setBlockNumber(_blockNumber);
+      settrxnInfo((await alchemy.core.getBlockWithTransactions(_blockNumber)).transactions);
     }
 
     getBlockNumber();
   });
 
-  return <div className="App">Block Number: {blockNumber}</div>;
+
+  return ( <div className="App">
+            <h1>Block Number: {blockNumber}</h1>
+              <ul>
+                {trxnInfo.map(item => {
+                  return <li>{JSON.stringify(item,null,2)}</li>;
+                  })}
+            </ul>
+              {/* TRXN Info: {JSON.stringify(trxnInfo, null, 2)} */}
+          </div>
+  );
 }
 
 export default App;
